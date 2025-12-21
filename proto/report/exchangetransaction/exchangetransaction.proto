@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option go_package = "github.com/joseMarciano/crypto-manager/exchangetransaction";
+
+message FetchExchangeTransactionRequest {
+  string start_date = 1;
+  string end_date = 2;
+}
+
+message Total {
+  double amount = 1;
+  string type = 2;
+}
+
+message Date {
+  string date = 1;
+  repeated Total totals = 2;
+}
+
+message Exchange {
+  string exchange_id = 1;
+  repeated Date dates = 2;
+}
+
+message FetchExchangeTransactionResponse {
+  repeated Exchange data = 1;
+}
+
+service ExchangeTransactionHandler {
+  rpc Execute (FetchExchangeTransactionRequest) returns (FetchExchangeTransactionResponse);
+}

@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package = "github.com/joseMarciano/crypto-manager/balance";
+
+message FetchBalanceRequest {
+  string user_id = 1;
+}
+
+message Balance {
+  string exchange_id = 1;
+  double balance = 2;
+}
+
+message FetchBalanceResponse {
+  string user_id = 1;
+  double total_balance = 2;
+  repeated Balance balances = 3;
+}
+
+service BalanceHandler {
+  rpc Execute (FetchBalanceRequest) returns (FetchBalanceResponse);
+}

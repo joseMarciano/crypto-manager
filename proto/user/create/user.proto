@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "github.com/joseMarciano/crypto-manager/createuser";
+
+message CreateUserRequest {
+  string name = 1;
+  string birthday = 2;
+  string document_number = 3;
+}
+
+message CreateUserResponse {
+  string id = 1;
+  string name = 2;
+  string birthday = 3;
+  string document_number = 4;
+}
+
+service CreateUserHandler {
+  rpc Execute (CreateUserRequest) returns (CreateUserResponse);
+}

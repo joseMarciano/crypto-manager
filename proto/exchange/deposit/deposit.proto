@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "github.com/joseMarciano/crypto-manager/deposit";
+
+message DepositRequest {
+  string exchange_id = 1;
+  string account_id = 2;
+  double amount = 3;
+}
+
+message DepositResponse {
+  string account_id = 1;
+  double balance = 2;
+}
+
+service DepositHandler {
+  rpc Execute (DepositRequest) returns (DepositResponse);
+}

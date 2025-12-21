@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "github.com/joseMarciano/crypto-manager/createexchange";
+
+message CreateExchangeRequest {
+  string name = 1;
+  sint32 minimum_age = 2;
+  double maximum_transfer_amount = 3;
+}
+
+message CreateExchangeResponse {
+  string id = 1;
+  string name = 2;
+  uint32 minimum_age = 3;
+  double maximum_transfer_amount = 4;
+}
+
+service CreateExchangeHandler {
+  rpc Execute (CreateExchangeRequest) returns (CreateExchangeResponse);
+}

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "github.com/joseMarciano/crypto-manager/createaccount";
+
+message CreateAccountRequest {
+  string user_id = 1;
+  string exchange_id = 2;
+}
+
+message CreateAccountResponse {
+  string id = 1;
+  string user_id = 2;
+  string exchange_id = 3;
+  double balance = 4;
+}
+
+service CreateAccountHandler {
+  rpc Execute (CreateAccountRequest) returns (CreateAccountResponse);
+}

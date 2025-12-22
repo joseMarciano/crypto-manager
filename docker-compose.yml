@@ -5,8 +5,18 @@ services:
         environment:
             POSTGRES_USER: local
             POSTGRES_PASSWORD: local
-            POSTGRES_DB: account_management_local
+            POSTGRES_DB: crypto_app
         volumes:
             - ./init.sql:/docker-entrypoint-initdb.d/init.sql
         ports:
             - "5432:5432"
+
+    nats:
+        image: nats:2.12.3-alpine3.22
+        container_name: nats
+        ports:
+            - "4222:4222"
+            - "8222:8222"
+            - "6222:6222"
+        command:
+            - "-js"

@@ -9,6 +9,7 @@ import (
 type (
 	Configuration struct {
 		Database Database
+		Nats     Nats
 		Server   Server
 	}
 
@@ -23,7 +24,7 @@ type (
 
 func NewLoader() *Loader {
 	return &Loader{
-		loaders: []loaderConfig{databaseLoader, serverLoader},
+		loaders: []loaderConfig{databaseLoader, natsLoader, serverLoader},
 	}
 }
 

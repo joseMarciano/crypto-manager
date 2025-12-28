@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"github.com/joseMarciano/crypto-manager/internal/app/exchange/events/exchangetransactionevents"
 	"github.com/joseMarciano/crypto-manager/internal/app/exchange/handler/createaccount"
 	"github.com/joseMarciano/crypto-manager/internal/app/exchange/handler/createexchange"
 	"github.com/joseMarciano/crypto-manager/internal/app/exchange/handler/deposit"
@@ -24,10 +25,24 @@ func exchangesModule(app *infra.Application) {
 	transactionRepo := repository.NewTransactionRepository(app.DB)
 	userRepo := userrepository.New(app.DB)
 
+	etNotifier, err := exchangetransactionevents.NewNotifier(app.JetStream, app.Configuration.Nats)
+	if err != nil {
+		panic(err)
+	}
+
+	etReceiver, err := exchangetransactionevents.NewReceiver(transactionRepo, app.JetStream, app.Configuration.Nats)
+	if err != nil {
+		panic(err)
+	}
+
 	createExchangeUC := createexchangeuc.New(exchangeRepo)
 	createAccountUC := createaccountuc.New(accountRepo, accountRepo, exchangeRepo, userRepo)
-	depositUC := deposituc.New(transactionRepo, accountRepo, accountRepo, exchangeRepo)
-	withDrawUC := withdrawuc.New(transactionRepo, accountRepo, accountRepo, exchangeRepo)
+	depositUC := deposituc.New(etNotifier, accountRepo, accountRepo, exchangeRepo)
+	withDrawUC := withdrawuc.New(etNotifier, accountRepo, accountRepo, exchangeRepo)
+
+	if err = etReceiver.Start(); err != nil {
+		panic(err)
+	}
 
 	createexchangepb.RegisterCreateExchangeHandlerServer(app.Server.GRPC, createexchange.New(createExchangeUC))
 	createaccountpb.RegisterCreateAccountHandlerServer(app.Server.GRPC, createaccount.New(createAccountUC))

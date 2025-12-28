@@ -10,10 +10,6 @@ import (
 )
 
 type (
-	ExchangeTransactionCreator interface {
-		CreateTransaction(context.Context, domain.ExchangeTransaction) (domain.ExchangeTransaction, error)
-	}
-
 	AccountUpdater interface {
 		UpdateAccount(context.Context, domain.Account) (domain.Account, error)
 	}
@@ -25,16 +21,21 @@ type (
 	ExchangeFinder interface {
 		FindExchangeByID(context.Context, string) (domain.Exchange, error)
 	}
+
+	ExchangeTransactionNotifier interface {
+		Notify(ctx context.Context, transaction domain.ExchangeTransaction) error
+	}
+
 	UseCase struct {
-		exchangeTransactionCreator ExchangeTransactionCreator
-		accountUpdater             AccountUpdater
-		accountFinder              AccountFinder
-		exchangeFinder             ExchangeFinder
+		accountUpdater              AccountUpdater
+		accountFinder               AccountFinder
+		exchangeFinder              ExchangeFinder
+		exchangeTransactionNotifier ExchangeTransactionNotifier
 	}
 )
 
-func New(etCreator ExchangeTransactionCreator, accUpdater AccountUpdater, accFinder AccountFinder, eFinder ExchangeFinder) UseCase {
-	return UseCase{exchangeTransactionCreator: etCreator, accountUpdater: accUpdater, accountFinder: accFinder, exchangeFinder: eFinder}
+func New(etNotifier ExchangeTransactionNotifier, accUpdater AccountUpdater, accFinder AccountFinder, eFinder ExchangeFinder) UseCase {
+	return UseCase{exchangeTransactionNotifier: etNotifier, accountUpdater: accUpdater, accountFinder: accFinder, exchangeFinder: eFinder}
 }
 
 func (uc UseCase) Execute(ctx context.Context, input Input) (Output, error) {
@@ -70,6 +71,10 @@ func (uc UseCase) Execute(ctx context.Context, input Input) (Output, error) {
 		return Output{}, err
 	}
 
-	_, err = uc.exchangeTransactionCreator.CreateTransaction(ctx, toExchangeTransaction(exchange.ID, input.Amount)) //TODO: put this as async notification if have time
+	err = uc.exchangeTransactionNotifier.Notify(ctx, toExchangeTransaction(exchange.ID, input.Amount))
+	if err != nil {
+		return Output{}, errorspkg.NewUnexpectedError("unexpected error notifying exchange transaction", err)
+	}
+
 	return toOutput(updatedAccount), nil
 }

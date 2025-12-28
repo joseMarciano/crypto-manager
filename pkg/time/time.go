@@ -9,8 +9,15 @@ func ParseCanonical(value string) (time.Time, error) {
 	return parse(value, time.DateOnly)
 }
 
+func ParseRFC3339(value string) (time.Time, error) {
+	return parse(value, time.RFC3339)
+}
 func FormatCanonical(t time.Time) string {
 	return format(t, time.DateOnly)
+}
+
+func FormatRFC3339(t time.Time) string {
+	return format(t, time.RFC3339)
 }
 
 func parse(value, layout string) (time.Time, error) {

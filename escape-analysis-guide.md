@@ -1,5 +1,7 @@
 # Go Escape Analysis Guide
 
+> When running these examples locally in this repository, prefix Go commands with `mise exec --` to use the pinned toolchain (for example, `mise exec -- go build -gcflags='-m' ./...`). The CI example below configures Go independently.
+
 ## Table of Contents
 - [What is Escape Analysis?](#what-is-escape-analysis)
 - [How to Execute Escape Analysis](#how-to-execute-escape-analysis)

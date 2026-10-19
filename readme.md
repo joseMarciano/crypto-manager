@@ -98,15 +98,33 @@ engineering practices:
 
 To run the project locally you need to have:
 
-- **Docker** installed
-- **Golang >= 1.24.0** installed
+- **mise** installed
+- **Docker Engine** installed and running (Docker Desktop or Colima)
 
 ### Steps
 
-1. From the project root, run:
+1. From the project root, install the pinned tools:
    ```bash
-   make run
-2. This command will:
-    - Start the Postgres database in Docker
-    - Start the Go server
-3. The API will be available at: `http://localhost:8080`
+   mise install
+   ```
+2. If you use Colima, start it before running the app:
+   ```bash
+   colima start
+   ```
+3. Start the dependencies and Go server:
+   ```bash
+   mise run run
+   ```
+4. The API will be available at: `http://localhost:8080`
+
+Other available tasks:
+
+```bash
+mise run build
+mise run test
+mise run tidy
+mise run fmt
+mise run reset
+mise run proto-gen exchange/create/exchange.proto
+mise run proto-gen-all
+```

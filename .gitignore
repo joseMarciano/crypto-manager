@@ -1,0 +1,15 @@
+# IDE files
+.idea/
+
+# macOS and editor temporary files
+.DS_Store
+*~
+*.swp
+*.swo
+
+# Go build and test artifacts
+/bin/
+/main
+/server
+*.test
+*.out

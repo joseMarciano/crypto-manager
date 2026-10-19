@@ -98,6 +98,11 @@ To run the project locally you need to have:
 
 ### Steps
 
+> [!WARNING]
+> Upgrading from a local database created before Liquibase? Run `mise run reset` before the first migration. It removes
+> local Compose volumes and all database data. The initial Liquibase changeset recreates the schema from scratch, so
+> `mise run db-migrate` without resetting an existing database will fail on the existing tables.
+
 1. From the project root, install the pinned tools:
    ```bash
    mise install

@@ -1,8 +1,8 @@
 module github.com/joseMarciano/crypto-manager
 
-go 1.24.0
+go 1.27.0
 
-toolchain go1.24.6
+toolchain go1.27.2
 
 require (
 	github.com/go-playground/validator/v10 v10.27.0

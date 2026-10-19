@@ -79,11 +79,6 @@ engineering practices:
 
 - Integrate **zLogger** for structured, consistent logging both in the **GORM layer** and in the **Gorilla Mux server**.
 
-### 🔹 Database Migrations
-
-- Replace the current **`init.sql` approach** (used for MVP purposes) with a proper **migration tool** (e.g., *
-  *Liquibase**).
-
 ### 🔹 Static Analysis & Linting
 
 - Add **golangci-lint** to the project to enforce coding standards.
@@ -103,6 +98,11 @@ To run the project locally you need to have:
 
 ### Steps
 
+> [!WARNING]
+> Upgrading from a local database created before Liquibase? Run `mise run reset` before the first migration. It removes
+> local Compose volumes and all database data. The initial Liquibase changeset recreates the schema from scratch, so
+> `mise run db-migrate` without resetting an existing database will fail on the existing tables.
+
 1. From the project root, install the pinned tools:
    ```bash
    mise install
@@ -111,11 +111,15 @@ To run the project locally you need to have:
    ```bash
    colima start
    ```
-3. Start the dependencies and Go server:
+3. Apply pending database schema migrations (required for a fresh database and after schema changes):
+   ```bash
+   mise run db-migrate
+   ```
+4. Start the dependencies and Go server:
    ```bash
    mise run run
    ```
-4. The API will be available at: `http://localhost:8080`
+5. The API will be available at: `http://localhost:8080`
 
 Other available tasks:
 
@@ -125,6 +129,15 @@ mise run test
 mise run tidy
 mise run fmt
 mise run reset
+mise run db-status
+mise run db-changelog-sync
+mise run db-migrate
 mise run proto-gen exchange/create/exchange.proto
 mise run proto-gen-all
 ```
+
+Migrations are explicit: `mise run run` does not apply them automatically. Use `mise run db-status` to see pending
+changesets. `mise run db-changelog-sync` only marks changesets as applied for a database whose schema already matches
+the changelog; it does not create tables and must not be used to bootstrap an empty database. `mise run reset` removes
+the local Compose volumes and all database data; run `mise run db-migrate` afterward to recreate the schema. Seed data
+is not included in the migration changelog and is handled separately.

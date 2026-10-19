@@ -1,6 +1,8 @@
 # IDE files
 .idea/
-
+graphify-out/
+docs/superpowers/
+.superpowers/
 # macOS and editor temporary files
 .DS_Store
 *~

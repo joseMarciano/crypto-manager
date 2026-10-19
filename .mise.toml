@@ -7,7 +7,19 @@ docker-compose = "5.6.0"
 
 [tasks.run]
 description = "Start dependencies and run the Go server"
-run = "docker-compose up -d && sleep 2 && go run ./cmd/server/main.go"
+run = "docker-compose up -d --wait && go run ./cmd/server/main.go"
+
+[tasks.db-changelog-sync]
+description = "Baseline a database whose schema already matches Liquibase"
+run = "docker-compose run --build --rm liquibase changelog-sync"
+
+[tasks.db-status]
+description = "Show Liquibase changesets pending for the local database"
+run = "docker-compose run --build --rm liquibase status --verbose"
+
+[tasks.db-migrate]
+description = "Apply pending Liquibase database migrations"
+run = "docker-compose run --build --rm liquibase update"
 
 [tasks.reset]
 description = "Stop containers and remove persistent volumes"

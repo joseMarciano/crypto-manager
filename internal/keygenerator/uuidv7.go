@@ -1,10 +1,10 @@
 package keygenerator
 
 import (
-	"github.com/google/uuid"
+	"uuid"
 )
 
 func Generate() string {
-	u, _ := uuid.NewV7()
+	u := uuid.NewV7()
 	return u.String()
 }

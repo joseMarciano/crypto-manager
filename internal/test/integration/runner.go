@@ -14,6 +14,11 @@ import (
 	"github.com/joseMarciano/crypto-manager/internal/test/integration/db"
 )
 
+const (
+	integrationCoverageProfile = "coverage-integration.out"
+	integrationCoverageHTML    = "coverage-integration.html"
+)
+
 func Run(ctx context.Context, args []string) (exitCode int) {
 	repoRoot, err := repositoryRoot()
 	if err != nil {
@@ -42,6 +47,13 @@ func Run(ctx context.Context, args []string) (exitCode int) {
 		return 1
 	}
 
+	profilePath := coverageProfilePath(args)
+	if err = generateCoverageHTML(ctx, repoRoot, profilePath); err != nil {
+		fmt.Fprintf(os.Stderr, "generate integration coverage HTML: %v\n", err)
+		return 1
+	}
+	fmt.Fprintf(os.Stdout, "Integration coverage profile: %s\nIntegration coverage HTML: %s\n", profilePath, integrationCoverageHTML)
+
 	return 0
 }
 
@@ -54,11 +66,49 @@ func cleanup(runner *db.Runner) {
 }
 
 func buildGoTestArgs(args []string) []string {
-	result := []string{"-tags=integration", "-count=1", "-parallel=10"}
+	result := []string{
+		"-tags=integration",
+		"-count=1",
+		"-parallel=10",
+		"-coverprofile=" + integrationCoverageProfile,
+	}
 	if len(args) == 0 {
 		return append(result, "./...")
 	}
 	return append(result, args...)
+}
+
+func coverageProfilePath(args []string) string {
+	profile := integrationCoverageProfile
+	for i, arg := range args {
+		if after, ok := strings.CutPrefix(arg, "-coverprofile="); ok {
+			profile = after
+			continue
+		}
+		if arg == "-coverprofile" && i+1 < len(args) {
+			profile = args[i+1]
+		}
+	}
+	return profile
+}
+
+func generateCoverageHTML(ctx context.Context, repoRoot string, profilePath string) error {
+	command := exec.CommandContext(
+		ctx,
+		"go",
+		"tool",
+		"cover",
+		"-html="+profilePath,
+		"-o",
+		integrationCoverageHTML,
+	)
+	command.Dir = repoRoot
+	command.Stdout = os.Stdout
+	command.Stderr = os.Stderr
+	if err := command.Run(); err != nil {
+		return fmt.Errorf("run go tool cover: %w", err)
+	}
+	return nil
 }
 
 func repositoryRoot() (string, error) {

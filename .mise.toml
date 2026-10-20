@@ -51,7 +51,13 @@ description = "Run all Go tests"
 run = "go test ./..."
 
 [tasks.test-integration]
-description = "Run repository integration tests with disposable PostgreSQL"
+description = """
+Run repository integration tests with disposable PostgreSQL.
+Pass Go test flags and package paths after `--`, for example:
+  mise run test-integration -- -v -parallel=2 ./internal/app/exchange/repository
+Filter a specific test with `-run`:
+  mise run test-integration -- -run TestAccountRepository_CreateExistsFindUpdateAndFindByUserID ./internal/app/exchange/repository
+"""
 raw_args = true
 run = "go run ./cmd/testintegration"
 

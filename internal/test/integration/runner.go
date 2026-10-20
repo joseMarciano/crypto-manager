@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/joseMarciano/crypto-manager/internal/logger"
 	"github.com/joseMarciano/crypto-manager/internal/test/integration/db"
 )
 
@@ -22,13 +23,13 @@ const (
 func Run(ctx context.Context, args []string) (exitCode int) {
 	repoRoot, err := repositoryRoot()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logger.Error(ctx, "failed to locate integration repository root", "error", err)
 		return 1
 	}
 
 	runner, err := db.Start(ctx, repoRoot)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "start integration test resources: %v\n", err)
+		logger.Error(ctx, "failed to start integration test resources", "error", err)
 		return 1
 	}
 	defer cleanup(runner)
@@ -43,16 +44,16 @@ func Run(ctx context.Context, args []string) (exitCode int) {
 		if exitErr, ok := errors.AsType[*exec.ExitError](err); ok {
 			return exitErr.ExitCode()
 		}
-		fmt.Fprintf(os.Stderr, "run go test for integration tests: %v\n", err)
+		logger.Error(ctx, "failed to run integration tests", "error", err)
 		return 1
 	}
 
 	profilePath := coverageProfilePath(args)
 	if err = generateCoverageHTML(ctx, repoRoot, profilePath); err != nil {
-		fmt.Fprintf(os.Stderr, "generate integration coverage HTML: %v\n", err)
+		logger.Error(ctx, "failed to generate integration coverage HTML", "error", err)
 		return 1
 	}
-	fmt.Fprintf(os.Stdout, "Integration coverage profile: %s\nIntegration coverage HTML: %s\n", profilePath, integrationCoverageHTML)
+	logger.Info(ctx, "integration tests completed", "coverage_profile", profilePath, "coverage_html", integrationCoverageHTML)
 
 	return 0
 }
@@ -61,7 +62,7 @@ func cleanup(runner *db.Runner) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	if err := runner.Close(ctx); err != nil {
-		fmt.Fprintf(os.Stderr, "close integration test resources: %v\n", err)
+		logger.Error(ctx, "failed to close integration test resources", "error", err)
 	}
 }
 

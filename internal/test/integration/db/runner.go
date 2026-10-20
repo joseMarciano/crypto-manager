@@ -13,6 +13,7 @@ import (
 	"uuid"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/joseMarciano/crypto-manager/internal/logger"
 	mobyContainer "github.com/moby/moby/api/types/container"
 	mobyNetwork "github.com/moby/moby/api/types/network"
 	"github.com/testcontainers/testcontainers-go"
@@ -132,7 +133,7 @@ func cleanup(runner *Runner, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	if err = runner.Close(ctx); err != nil {
-		fmt.Fprintf(os.Stderr, "close integration test resources: %v\n", err)
+		logger.Error(ctx, "failed to close integration test resources after startup failure", "error", err)
 	}
 }
 

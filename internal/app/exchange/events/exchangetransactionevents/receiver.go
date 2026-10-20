@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/joseMarciano/crypto-manager/internal/app/exchange/domain"
 	"github.com/joseMarciano/crypto-manager/internal/config"
+	"github.com/joseMarciano/crypto-manager/internal/logger"
 	"github.com/nats-io/nats.go/jetstream"
 )
 
@@ -50,21 +50,21 @@ func (r Receiver) Start() error {
 func (r Receiver) process(msg jetstream.Msg) {
 	var event Event
 	if err := json.Unmarshal(msg.Data(), &event); err != nil {
-		log.Println("error on unmarshalling exchange transaction event:", err)
+		logger.Error(context.Background(), "error on unmarshalling exchange transaction event", "error", err)
 		msg.Nak()
 		return
 	}
 
 	transaction, err := event.toDomain()
 	if err != nil {
-		log.Println("error on converting exchange transaction event to domain:", err)
+		logger.Error(context.Background(), "error on converting exchange transaction event to domain", "error", err)
 		msg.Nak()
 		return
 	}
 
 	_, err = r.exchangeTransactionCreator.CreateTransaction(context.Background(), transaction)
 	if err != nil {
-		log.Println("error on creating exchange transaction from event:", err)
+		logger.Error(context.Background(), "error on creating exchange transaction from event", "error", err)
 		msg.Nak()
 		return
 	}

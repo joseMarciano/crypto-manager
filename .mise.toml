@@ -50,6 +50,11 @@ run = "go build ./..."
 description = "Run all Go tests"
 run = "go test ./..."
 
+[tasks.test-integration]
+description = "Run repository integration tests with disposable PostgreSQL"
+raw_args = true
+run = "go run ./cmd/testintegration"
+
 [tasks.tidy]
 description = "Tidy Go module dependencies"
 run = "go mod tidy"

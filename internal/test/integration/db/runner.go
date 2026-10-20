@@ -40,7 +40,9 @@ type Runner struct {
 
 func Start(ctx context.Context, repoRoot string) (_ *Runner, returnErr error) {
 	runner := &Runner{templateDatabase: templateDatabase}
-	defer cleanup(runner, returnErr)
+	defer func() {
+		cleanup(runner, returnErr)
+	}()
 
 	var err error
 	runner.network, err = network.New(ctx)
